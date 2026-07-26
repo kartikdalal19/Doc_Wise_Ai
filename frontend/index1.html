@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DocWise AI</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- Header -->
+
+        <a href="/" class="home-btn">
+    <i class="fa-solid fa-house"></i>
+    Home
+</a>
+
+        <header class="hero">
+
+            <h1>
+                📚 DocWise AI
+            </h1>
+
+            <p class="subtitle">
+                Intelligent Document Analysis • AI Chat • Fact Verification
+            </p>
+
+        </header>
+
+
+        <!-- Upload Card -->
+
+        <section class="upload-box">
+
+            <h2>
+                <i class="fa-solid fa-file-pdf"></i>
+                Upload Document
+            </h2>
+
+            <label for="pdfFile" class="upload-area">
+
+                <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+
+                <h3>
+                    Drag & Drop your PDF
+                </h3>
+
+                <p>
+                    or click anywhere to browse
+                </p>
+
+            </label>
+
+           <input
+type="file"
+id="pdfFile"
+accept=".pdf,.docx,.txt"
+/>
+
+            <div class="upload-actions">
+
+                <button onclick="uploadPDF()">
+
+                    <i class="fa-solid fa-upload"></i>
+
+                    Upload Document
+
+                </button>
+
+            </div>
+
+            <p id="uploadStatus"></p>
+
+        </section>
+
+
+        <!-- Chat -->
+
+        <section class="chat-box">
+
+            <div class="chat-header">
+
+                <div class="chat-title">
+
+                    🤖 AI Assistant
+
+                </div>
+
+                <div class="status">
+
+                    <span class="status-dot"></span>
+
+                    Ready
+
+                </div>
+
+            </div>
+
+            <div id="chat">
+
+                <div class="message bot">
+
+                    <div class="avatar">
+
+                        🤖
+
+                    </div>
+
+                   <div class="bubble">
+
+    <strong>🤖 Welcome to <span style="color:#4f8cff;">DocWise AI</span></strong>
+
+    <br><br>
+
+    Hello! 👋 I'm your intelligent document assistant.
+
+    <br><br>
+
+    Upload a PDF and I can understand, search, analyse and explain its contents using Retrieval-Augmented Generation (RAG), semantic search and AI reasoning.
+
+    <br><br>
+
+    <strong>✨ What I can do</strong>
+
+    <ul>
+
+        <li>📄 Answer questions directly from your document</li>
+
+        <li>🧠 Explain concepts in simple language with examples</li>
+
+        <li>📚 Summarize the entire document</li>
+
+        <li>📑 Summarize a specific page or page range</li>
+
+        <li>🔍 Create topic-based summaries using semantic (FAISS) search</li>
+
+        <li>🌐 Search Wikipedia & Tavily when the document doesn't contain the answer</li>
+
+        <li>🔀 Automatically decide whether to use the document or the web</li>
+
+        <li>📖 Show the exact document evidence used for every answer</li>
+
+        <li>🛠 Display the agent's reasoning, routing decision and tools used</li>
+
+        <li>✅ Fact-check responses for higher reliability</li>
+
+    </ul>
+
+    <strong>💬 Try asking:</strong>
+
+    <ul>
+
+        <li>"What is <code>abs()</code>?"</li>
+
+        <li>"Who created Python?"</li>
+
+        <li>"Summarize this document."</li>
+
+        <li>"Summarize page 5."</li>
+
+        <li>"Summarize the inheritance section."</li>
+
+        <li>"Explain decorators with an example."</li>
+
+    </ul>
+
+    <strong>🚀 Just upload a PDF to get started!</strong>
+
+</div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Input -->
+
+            <div class="input-area">
+
+                <input
+
+                    id="question"
+
+                    placeholder="Ask anything about your document..."
+
+                    onkeypress="handleEnter(event)"
+
+                    autocomplete="off"
+
+                >
+
+                <button onclick="askQuestion()">
+
+                    <i class="fa-solid fa-paper-plane"></i>
+
+                </button>
+
+            </div>
+
+        </section>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="/js/script.js"></script>
+
+</body>
+
+</html>
+

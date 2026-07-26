@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DocWise AI - Intelligent Document Assistant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Geist:wght@400;500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .ambient-shadow {
+            box-shadow: 0px 10px 30px rgba(37, 99, 235, 0.08);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #004ac6 0%, #4b41e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .ai-progress-glow {
+            position: relative;
+            overflow: hidden;
+        }
+        .ai-progress-glow::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #004ac6, #4cd7f6, transparent);
+            animation: progress-move 3s infinite linear;
+        }
+        @keyframes progress-move {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        .marquee-container {
+            display: flex;
+            overflow: hidden;
+            user-select: none;
+            gap: 2rem;
+        }
+        .marquee-content {
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-around;
+            min-width: 100%;
+            gap: 2rem;
+            animation: scroll 30s linear infinite;
+        }
+        @keyframes scroll {
+            from { transform: translateX(0); }
+            to { transform: translateX(-100%); }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#c3c0ff",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "surface-container-highest": "#e0e3e5",
+                        "surface-container-high": "#e6e8ea",
+                        "surface-container": "#eceef0",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#dbe1ff",
+                        "surface-bright": "#f7f9fb",
+                        "tertiary": "#005e6e",
+                        "inverse-on-surface": "#eff1f3",
+                        "surface-dim": "#d8dadc",
+                        "error-container": "#ffdad6",
+                        "surface": "#f7f9fb",
+                        "outline": "#737686",
+                        "tertiary-fixed": "#acedff",
+                        "tertiary-container": "#00788c",
+                        "secondary-fixed": "#e2dfff",
+                        "on-secondary-fixed": "#0f0069",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#004e5c",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#3323cc",
+                        "tertiary-fixed-dim": "#4cd7f6",
+                        "surface-tint": "#0053db",
+                        "on-surface-variant": "#434655",
+                        "secondary-container": "#645efb",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-background": "#191c1e",
+                        "inverse-primary": "#b4c5ff",
+                        "on-secondary-container": "#fffbff",
+                        "secondary": "#4b41e1",
+                        "primary-container": "#2563eb",
+                        "outline-variant": "#c3c6d7",
+                        "primary": "#004ac6",
+                        "on-surface": "#191c1e",
+                        "inverse-surface": "#2d3133",
+                        "on-primary-container": "#eeefff",
+                        "background": "#f7f9fb",
+                        "on-tertiary-fixed": "#001f26",
+                        "on-primary-fixed": "#00174b",
+                        "surface-variant": "#e0e3e5",
+                        "surface-container-low": "#f2f4f6",
+                        "on-tertiary-container": "#d7f6ff",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "card": "20px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin-desktop": "40px",
+                        "max-width": "1440px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Geist"],
+                        "code": ["Geist"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["13px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "code": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                        "display-lg-mobile": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md overflow-x-hidden">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-xl border-b border-white/40 shadow-sm transition-all duration-300 ease-in-out">
+<div class="flex justify-between items-center px-margin-desktop py-4 max-w-max-width mx-auto">
+<div class="text-headline-md font-headline-md font-bold tracking-tight text-primary">DocWise AI</div>
+<div class="hidden md:flex gap-8 items-center">
+<a class="font-body-md text-body-md text-primary font-semibold border-b-2 border-primary transition-colors duration-300" href="#">Home</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-300" href="#features">Features</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-300" href="#how-it-works">How It Works</a></div>
+<div class="flex items-center gap-4">
+<a href="/chat"
+   class="text-on-surface-variant hover:text-primary transition-colors font-semibold">
+    Launch Chatbot
+</a>
+
+<a href="/chat"
+   class="bg-primary-container text-on-primary-container px-6 py-2.5 rounded-full font-semibold shadow-md hover:opacity-90 transition-all">
+    Get Started
+</a></div>
+</div>
+</nav>
+<!-- Hero Section -->
+<section class="relative pt-32 pb-20 overflow-hidden">
+
+<div class="max-w-max-width mx-auto px-margin-desktop grid md:grid-cols-2 gap-12 items-center">
+<div class="space-y-8">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-label-sm font-label-sm uppercase tracking-wider">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+                    Multi-Agent AI Document Assistant
+                </div>
+<h1 class="font-display-lg text-display-lg tracking-tight text-on-background">
+                    Your Intelligent <span class="gradient-text">AI Document Assistant</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg">
+Upload PDF, DOCX or TXT files and instantly ask questions, generate summaries, verify answers, and search beyond the document when required. DocWise AI intelligently combines Retrieval-Augmented Generation (RAG), semantic search, web tools and fact-checking to provide reliable answers.                </p>
+<div class="flex flex-wrap gap-4">
+<button class="bg-primary-container text-on-primary-container px-8 py-4 rounded-full font-bold shadow-lg hover:translate-y-[-2px] transition-all flex items-center gap-2">
+
+
+
+
+    <a href="/chat"
+class="bg-primary-container text-on-primary-container px-8 py-4 rounded-full font-bold shadow-lg hover:translate-y-[-2px] transition-all flex items-center gap-2">
+
+Launch DocWise AI
+
+<span class="material-symbols-outlined">
+arrow_forward
+</span>
+
+</a>
+
+
+
+
+</button>
+
+</div>
+</div>
+<div class="relative group">
+<div class="absolute -inset-4 bg-primary/10 rounded-full blur-3xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
+<div class="relative glass-panel rounded-card p-4 ambient-shadow overflow-hidden">
+<img class="w-full h-auto object-cover rounded-xl" data-alt="A high-fidelity 3D digital illustration of a futuristic AI assistant head composed of crystalline structures, surrounded by floating holographic document icons and interconnected glowing network nodes in a vibrant palette of primary blue and deep purple, high-key studio lighting with ethereal glassmorphic depth effects." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCCWRceeYCT-DXTeJAAuR9yqaC8AiXhVEyZ9AvhjEVIVJ-OS0nEoioJ-1dA6-H_fD61izYwZwlJstbLChhYyz_3TFmeJmnhfpf1EUe7bU6Cukm3ZES7_yv96KCzGH-r8J1NjxZF5XST7wFfvS6dsKe2J1WwgS6sIot44DkeC1o4fBY92i2tJA0AftSZ3LsZNvpbwlVkdl8RdA_K0AzJ4NUt7hbKSQp2TdrOpzRUe-kqzY9pRj8blmrqAhvNGhqgX8CVukM3wsKSHAh"/>
+<div class="absolute bottom-6 right-6 glass-panel p-4 rounded-xl border border-white/40 max-w-[200px] animate-bounce-slow">
+<p class="text-label-sm font-bold text-primary mb-1">Live Processing...</p>
+<div class="h-1 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary w-2/3 animate-pulse"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Hero Stats -->
+<section class="py-12 relative">
+<div class="max-w-max-width mx-auto px-margin-desktop grid grid-cols-2 md:grid-cols-4 gap-gutter">
+<div class="glass-panel p-6 rounded-card text-center ambient-shadow transition-transform hover:scale-105">
+<p class="text-primary font-bold text-display-lg-mobile">PDF • DOCX • TXT</p>
+<p class="text-on-surface-variant font-label-sm"></p>
+</div>
+<div class="glass-panel p-6 rounded-card text-center ambient-shadow transition-transform hover:scale-105">
+<p class="text-secondary font-bold text-display-lg-mobile">Semantic Search</p>
+<p class="text-on-surface-variant font-label-sm"></p>
+</div>
+<div class="glass-panel p-6 rounded-card text-center ambient-shadow transition-transform hover:scale-105">
+<p class="text-tertiary font-bold text-display-lg-mobile">Fact Checked</p>
+<p class="text-on-surface-variant font-label-sm"></p>
+</div>
+<div class="glass-panel p-6 rounded-card text-center ambient-shadow transition-transform hover:scale-105">
+<p class="text-primary font-bold text-display-lg-mobile">Multi-Agent RAG</p>
+<p class="text-on-surface-variant font-label-sm"></p>
+</div>
+</div>
+</section>
+<!-- Chat Preview -->
+<section class="py-24 bg-surface-container-low">
+
+    <div class="max-w-5xl mx-auto px-margin-desktop">
+
+        <div class="text-center mb-12">
+
+            <h2 class="font-headline-md text-headline-md text-on-surface mb-4">
+                See DocWise AI in Action
+            </h2>
+
+            <p class="text-on-surface-variant">
+                Upload a document, ask questions, generate summaries, and receive evidence-backed answers powered by RAG.
+            </p>
+
+        </div>
+
+        <div class="glass-panel rounded-card overflow-hidden ambient-shadow border border-white/60">
+
+            <!-- Header -->
+
+            <div class="bg-white/80 p-4 border-b border-surface-container-highest flex items-center justify-between">
+
+                <div class="flex items-center gap-3">
+
+                    <div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center">
+
+                        <span class="material-symbols-outlined text-on-primary-container text-[18px]">
+                            smart_toy
+                        </span>
+
+                    </div>
+
+                    <span class="font-bold text-on-surface">
+                        DocWise AI Assistant
+                    </span>
+
+                </div>
+
+                <div class="flex gap-2">
+
+                    <div class="w-2 h-2 rounded-full bg-error"></div>
+                    <div class="w-2 h-2 rounded-full bg-secondary-container"></div>
+                    <div class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></div>
+
+                </div>
+
+            </div>
+
+            <!-- Chat -->
+
+            <div class="p-8 space-y-6 bg-white/40">
+
+                <!-- User -->
+
+                <div class="flex justify-end">
+
+                    <div class="bg-primary-container text-on-primary-container px-6 py-4 rounded-2xl rounded-tr-none max-w-[80%] shadow-sm">
+
+                        <p class="font-body-md font-semibold">
+                            Summarize page 3 of this document and explain the key concepts.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <!-- AI -->
+
+                <div class="flex justify-start items-start gap-3">
+
+                    <div class="w-8 h-8 rounded-full bg-secondary-fixed flex items-center justify-center shrink-0">
+
+                        <span class="material-symbols-outlined text-on-secondary-fixed text-[18px]">
+                            auto_awesome
+                        </span>
+
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl rounded-tl-none max-w-[88%] space-y-5 ai-progress-glow">
+
+                        <div class="flex items-center gap-2 text-green-600 font-bold text-label-sm">
+
+                            <span class="material-symbols-outlined text-[18px]">
+                                verified
+                            </span>
+
+                            VERIFIED RESPONSE
+
+                        </div>
+
+                        <div>
+
+                            <h4 class="font-bold text-primary mb-2">
+                                📄 Summary
+                            </h4>
+
+                            <p class="text-on-surface">
+                                This page explains Retrieval-Augmented Generation (RAG), including document chunking,
+                                embedding generation, vector search using FAISS, and how relevant context is supplied
+                                to the language model before generating an answer.
+                            </p>
+
+                        </div>
+
+                        <div>
+
+                            <h4 class="font-bold text-primary mb-2">
+                                💡 Explanation
+                            </h4>
+
+                            <p class="text-on-surface">
+                                Instead of relying only on the AI model's memory, DocWise AI first searches your
+                                uploaded document, retrieves the most relevant chunks, and then generates an answer
+                                grounded in those chunks. This significantly reduces hallucinations.
+                            </p>
+
+                        </div>
+
+                        <div class="bg-surface-container-low p-4 rounded-xl border border-outline-variant">
+
+                            <div class="font-semibold mb-2">
+                                📌 Features Used
+                            </div>
+
+                            <div class="flex flex-wrap gap-2">
+
+                                <span class="px-3 py-1 rounded-full bg-primary-container text-sm">
+                                    PDF Retrieval
+                                </span>
+
+                                <span class="px-3 py-1 rounded-full bg-secondary-container text-sm">
+                                    Page Summary
+                                </span>
+
+                                <span class="px-3 py-1 rounded-full bg-tertiary-container text-sm">
+                                    FAISS Search
+                                </span>
+
+                                <span class="px-3 py-1 rounded-full bg-primary-fixed text-sm">
+                                    LLM Explanation
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="flex justify-between items-center border-t pt-4">
+
+                            <div class="text-primary font-semibold flex items-center gap-2">
+
+                                <span class="material-symbols-outlined">
+                                    description
+                                </span>
+
+                                Source: AI_Notes.pdf • Page 3
+
+                            </div>
+
+                            <div class="flex gap-3">
+
+                                <span class="material-symbols-outlined cursor-pointer hover:text-primary">
+                                    thumb_up
+                                </span>
+
+                                <span class="material-symbols-outlined cursor-pointer hover:text-primary">
+                                    content_copy
+                                </span>
+
+                                <span class="material-symbols-outlined cursor-pointer hover:text-primary">
+                                    share
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- Features Grid -->
+<section class="py-24 px-margin-desktop max-w-max-width mx-auto" id="features">
+<div class="text-center mb-16">
+<h2 class="font-display-lg text-display-lg-mobile md:text-display-lg mb-6">Everything You Need for <span class="gradient-text">Intelligent Analysis</span></h2>
+<p class="text-on-surface-variant max-w-2xl mx-auto">Our platform combines state-of-the-art AI models with robust retrieval systems to give you a competitive edge.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Card 1 -->
+<div class="glass-panel p-8 rounded-card hover:translate-y-[-8px] transition-all duration-300 group">
+<div class="w-12 h-12 bg-primary-container/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-[32px]">upload_file</span>
+</div>
+<h3 class="text-headline-md font-headline-md mb-3">Multi-format Upload</h3>
+<p class="text-on-surface-variant">Seamlessly process PDFs, Markdown, CSVs, and Word docs with automated OCR and layout detection.</p>
+</div>
+<!-- Card 2 -->
+<div class="glass-panel p-8 rounded-card hover:translate-y-[-8px] transition-all duration-300 group">
+<div class="w-12 h-12 bg-secondary-container/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-secondary text-[32px]">psychology</span>
+</div>
+<h3 class="text-headline-md font-headline-md mb-3">AI Q&amp;A</h3>
+<p class="text-on-surface-variant">Ask any question about your data and receive nuanced, context-aware answers in seconds.</p>
+</div>
+<!-- Card 3 -->
+<div class="glass-panel p-8 rounded-card hover:translate-y-[-8px] transition-all duration-300 group">
+<div class="w-12 h-12 bg-tertiary-container/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-tertiary text-[32px]">summarize</span>
+</div>
+<h3 class="text-headline-md font-headline-md mb-3">Smart Summaries</h3>
+<p class="text-on-surface-variant">Generate executive summaries that capture the core message of 100+ page documents instantly.</p>
+</div>
+<!-- Card 4 -->
+<div class="glass-panel p-8 rounded-card hover:translate-y-[-8px] transition-all duration-300 group">
+<div class="w-12 h-12 bg-primary-fixed-dim/30 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-on-primary-fixed-variant text-[32px]">manage_search</span>
+</div>
+<h3 class="text-headline-md font-headline-md mb-3">Semantic Search</h3>
+<p class="text-on-surface-variant">Search by meaning, not just keywords. Find relevant information even if the terminology differs.</p>
+</div>
+<!-- Card 5 -->
+<div class="glass-panel p-8 rounded-card hover:translate-y-[-8px] transition-all duration-300 group">
+<div class="w-12 h-12 bg-secondary-fixed-dim/30 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-on-secondary-fixed-variant text-[32px]">route</span>
+</div>
+<h3 class="text-headline-md font-headline-md mb-3">Agent Routing</h3>
+<p class="text-on-surface-variant">Intelligent routing of queries to specialized AI agents tailored for legal, medical, or technical analysis.</p>
+</div>
+<!-- Card 6 -->
+<div class="glass-panel p-8 rounded-card hover:translate-y-[-8px] transition-all duration-300 group">
+<div class="w-12 h-12 bg-error-container/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-error text-[32px]">fact_check</span>
+</div>
+<h3 class="text-headline-md font-headline-md mb-3">Fact Checking</h3>
+<p class="text-on-surface-variant">Cross-verify AI outputs against original source material to eliminate hallucinations and errors.</p>
+</div>
+</div>
+</section>
+<!-- Pipeline Section -->
+<section class="py-24 bg-surface-bright relative overflow-hidden" id="how-it-works">
+
+    <div class="max-w-max-width mx-auto px-margin-desktop">
+
+        <div class="flex flex-col items-center text-center mb-16">
+
+            <h2 class="font-display-lg text-display-lg-mobile md:text-display-lg mb-4">
+                How <span class="gradient-text">DocWise AI</span> Works
+            </h2>
+
+            <p class="text-on-surface-variant max-w-3xl">
+                DocWise AI follows a Retrieval-Augmented Generation (RAG) pipeline powered by FAISS,
+                intelligent routing, external search tools, and LLM reasoning to provide accurate,
+                explainable, and evidence-backed answers from your uploaded documents.
+            </p>
+
+        </div>
+
+        <div class="relative grid md:grid-cols-7 gap-8">
+
+            <!-- Connecting Line -->
+            <div class="hidden md:block absolute top-12 left-0 w-full h-[2px] bg-gradient-to-r from-primary via-secondary to-tertiary -z-10"></div>
+
+            <!-- Step 1 -->
+
+            <div class="group">
+
+                <div class="w-20 h-20 glass-panel rounded-2xl flex items-center justify-center mb-5 ambient-shadow group-hover:bg-primary group-hover:text-white transition-all duration-300">
+
+                    <span class="material-symbols-outlined text-[40px]">
+                        upload_file
+                    </span>
+
+                </div>
+
+                <h4 class="font-bold text-lg mb-2">
+                    Upload
+                </h4>
+
+                <p class="text-label-sm text-on-surface-variant">
+                    Upload PDF, DOCX, or TXT documents for intelligent processing.
+                </p>
+
+            </div>
+
+            <!-- Step 2 -->
+
+            <div class="group">
+
+                <div class="w-20 h-20 glass-panel rounded-2xl flex items-center justify-center mb-5 ambient-shadow group-hover:bg-secondary group-hover:text-white transition-all duration-300">
+
+                    <span class="material-symbols-outlined text-[40px]">
+                        content_cut
+                    </span>
+
+                </div>
+
+                <h4 class="font-bold text-lg mb-2">
+                    Chunking
+                </h4>
+
+                <p class="text-label-sm text-on-surface-variant">
+                    Split the document into semantic chunks while preserving page information.
+                </p>
+
+            </div>
+
+            <!-- Step 3 -->
+
+            <div class="group">
+
+                <div class="w-20 h-20 glass-panel rounded-2xl flex items-center justify-center mb-5 ambient-shadow group-hover:bg-tertiary group-hover:text-white transition-all duration-300">
+
+                    <span class="material-symbols-outlined text-[40px]">
+                        psychology
+                    </span>
+
+                </div>
+
+                <h4 class="font-bold text-lg mb-2">
+                    Embeddings
+                </h4>
+
+                <p class="text-label-sm text-on-surface-variant">
+                    Convert every chunk into vector embeddings for semantic understanding.
+                </p>
+
+            </div>
+
+            <!-- Step 4 -->
+
+            <div class="group">
+
+                <div class="w-20 h-20 glass-panel rounded-2xl flex items-center justify-center mb-5 ambient-shadow group-hover:bg-primary-container group-hover:text-white transition-all duration-300">
+
+                    <span class="material-symbols-outlined text-[40px]">
+                        database
+                    </span>
+
+                </div>
+
+                <h4 class="font-bold text-lg mb-2">
+                    FAISS Index
+                </h4>
+
+                <p class="text-label-sm text-on-surface-variant">
+                    Store embeddings in a FAISS vector database for ultra-fast similarity search.
+                </p>
+
+            </div>
+
+            <!-- Step 5 -->
+
+            <div class="group">
+
+                <div class="w-20 h-20 glass-panel rounded-2xl flex items-center justify-center mb-5 ambient-shadow group-hover:bg-secondary-container group-hover:text-white transition-all duration-300">
+
+                    <span class="material-symbols-outlined text-[40px]">
+                        route
+                    </span>
+
+                </div>
+
+                <h4 class="font-bold text-lg mb-2">
+                    Smart Routing
+                </h4>
+
+                <p class="text-label-sm text-on-surface-variant">
+                    Decide whether to answer from the document, summarize it, or search external sources.
+                </p>
+
+            </div>
+
+            <!-- Step 6 -->
+
+            <div class="group">
+
+                <div class="w-20 h-20 glass-panel rounded-2xl flex items-center justify-center mb-5 ambient-shadow group-hover:bg-tertiary-container group-hover:text-white transition-all duration-300">
+
+                    <span class="material-symbols-outlined text-[40px]">
+                        smart_toy
+                    </span>
+
+                </div>
+
+                <h4 class="font-bold text-lg mb-2">
+                    LLM Response
+                </h4>
+
+                <p class="text-label-sm text-on-surface-variant">
+                    Generate explanations, examples, and structured summaries using retrieved context.
+                </p>
+
+            </div>
+
+            <!-- Step 7 -->
+
+            <div class="group">
+
+                <div class="w-20 h-20 glass-panel rounded-2xl flex items-center justify-center mb-5 ambient-shadow group-hover:bg-green-600 group-hover:text-white transition-all duration-300">
+
+                    <span class="material-symbols-outlined text-[40px]">
+                        verified
+                    </span>
+
+                </div>
+
+                <h4 class="font-bold text-lg mb-2">
+                    Verified Answer
+                </h4>
+
+                <p class="text-label-sm text-on-surface-variant">
+                    Display the final answer with page references, evidence, confidence score, and fact checking.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- Tech Stack Marquee -->
+
+<!-- CTA Section -->
+<section class="py-24 px-margin-desktop max-w-max-width mx-auto">
+<div class="relative bg-gradient-to-r from-primary to-secondary p-12 md:p-20 rounded-card overflow-hidden shadow-2xl">
+<!-- Decorative Blur -->
+<div class="absolute -top-24 -right-24 w-64 h-64 bg-tertiary-fixed blur-[80px] opacity-40"></div>
+<div class="absolute -bottom-24 -left-24 w-64 h-64 bg-primary-fixed blur-[80px] opacity-40"></div>
+<div class="relative z-10 text-center text-on-primary">
+<h2 class="font-display-lg text-display-lg-mobile md:text-display-lg mb-6">Ready to Explore Your Documents?</h2>
+<p class="text-primary-fixed text-body-lg mb-10 max-w-2xl mx-auto opacity-90">Upload your documents and experience AI-powered question answering, document summarization, semantic search and fact verification—all in one place.</p>
+<div class="flex flex-col sm:flex-row gap-4 justify-center">
+<button class="bg-surface-container-lowest text-primary px-10 py-5 rounded-full font-bold text-body-lg shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-3">
+<span class="material-symbols-outlined">upload_file</span>
+                     <a href="/chat">   Launch DocWise AI </a>
+                    </button>
+
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest py-12 border-t border-surface-container-highest">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop max-w-max-width mx-auto">
+<div class="space-y-6">
+<div class="text-body-lg font-bold text-on-surface">DocWise AI</div>
+<p class="text-on-surface-variant text-label-sm">Transforming the way humanity interacts with technical knowledge through advanced AI orchestration.</p>
+</div>
+
+
+
+<div class="space-y-6">
+<h4 class="font-bold text-on-surface mb-6">Newsletter</h4>
+<div class="flex gap-2">
+<input class="bg-surface-container-low border-none rounded-lg px-4 py-2 w-full focus:ring-2 focus:ring-primary" placeholder="Email address" type="email"/>
+<button class="bg-primary text-white p-2 rounded-lg hover:bg-secondary transition-colors">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+<div class="flex gap-4">
+<a class="text-on-surface-variant hover:text-primary transition-opacity opacity-80 hover:opacity-100" href="https://www.linkedin.com/in/kartik-dalal-642a42320">LinkedIn</a>
+<a class="text-on-surface-variant hover:text-primary transition-opacity opacity-80 hover:opacity-100" href="https://github.com/kartikdalal19">GitHub</a>
+</div>
+</div>
+</div>
+<div class="mt-12 pt-8 border-t border-surface-container px-margin-desktop max-w-max-width mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-label-sm text-on-surface-variant opacity-80">© 2026 DocWise AI. All rights reserved.</p>
+<div class="flex gap-6 text-label-sm text-on-surface-variant">
+</div>
+</div>
+</footer>
+<script>
+        // Simple Micro-interactions
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Sticky Navbar Effect
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 20) {
+                nav.classList.add('py-2', 'shadow-lg');
+                nav.classList.remove('py-4', 'shadow-sm');
+            } else {
+                nav.classList.add('py-4', 'shadow-sm');
+                nav.classList.remove('py-2', 'shadow-lg');
+            }
+        });
+    </script>
+</body></html>
