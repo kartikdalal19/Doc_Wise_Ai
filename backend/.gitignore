@@ -1,0 +1,28 @@
+# Environment
+.env
+
+# Virtual environment
+venv/
+.venv/
+
+
+# Python
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Uploaded documents
+backend/uploads/*
+
+# FAISS generated files
+vectorstore/
+*.index
+
+# Logs
+*.log
