@@ -285,14 +285,17 @@ def chat():
         question
     )
 
+    import traceback
 
     try:
         response = graph.invoke(question)
-    except Exception as e:
-        return jsonify({
-            "error": str(e)
-        }), 500
 
+    except Exception:
+        traceback.print_exc()
+    
+        return jsonify({
+            "error": traceback.format_exc()
+        }), 500
 
 
     # Send only required fields
