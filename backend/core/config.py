@@ -7,9 +7,12 @@ load_dotenv()
 class Settings:
 
     # Embeddings
-    HF_EMBEDDING_MODEL = (
-        "sentence-transformers/all-MiniLM-L6-v2"
-    )
+    # HF_EMBEDDING_MODEL = (
+    #     "sentence-transformers/all-MiniLM-L6-v2"
+    # )
+
+    HF_EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
+
     
     # LLM
     GROQ_MODEL = "llama-3.3-70b-versatile"
