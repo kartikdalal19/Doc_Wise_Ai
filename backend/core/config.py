@@ -7,8 +7,10 @@ load_dotenv()
 class Settings:
 
     # Embeddings
-    EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
-
+    HF_EMBEDDING_MODEL = (
+        "sentence-transformers/all-MiniLM-L6-v2"
+    )
+    
     # LLM
     GROQ_MODEL = "llama-3.3-70b-versatile"
     TEMPERATURE = 0
@@ -31,7 +33,12 @@ class Settings:
 
     # API Keys
     GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+    
     TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
+    
+    HF_TOKEN = os.getenv(
+        "HF_TOKEN"
+    )
 
 
 settings = Settings()
@@ -42,3 +49,8 @@ if not settings.GROQ_API_KEY:
 
 if settings.ENABLE_WEB_SEARCH and not settings.TAVILY_API_KEY:
     raise ValueError("TAVILY_API_KEY environment variable is not set.")
+
+if not settings.HF_TOKEN:
+    raise ValueError(
+        "HF_TOKEN environment variable is not set."
+    )
