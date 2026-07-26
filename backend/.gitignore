@@ -1,14 +1,15 @@
 # Environment
 .env
+.env.*
 
 # Virtual environment
 venv/
 .venv/
 
-
 # Python
 __pycache__/
 *.pyc
+*.pyo
 
 # IDE
 .vscode/
@@ -16,13 +17,25 @@ __pycache__/
 
 # OS
 .DS_Store
+Thumbs.db
 
 # Uploaded documents
 backend/uploads/*
+!backend/uploads/.gitkeep
 
 # FAISS generated files
 vectorstore/
 *.index
+*.faiss
+*.pkl
+
+# HuggingFace cache
+.cache/
+huggingface/
 
 # Logs
 *.log
+
+# Temporary files
+*.tmp
+*.temp
