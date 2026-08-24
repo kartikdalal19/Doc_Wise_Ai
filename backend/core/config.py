@@ -15,11 +15,12 @@ class Settings:
 
     
     # LLM
-    GROQ_MODEL = "llama-3.3-70b-versatile"
+    # GROQ_MODEL = "llama-3.3-70b-versatile"
+    GROQ_MODEL = "openai/gpt-oss-120b"
     TEMPERATURE = 0
 
     # Chunking
-    CHUNK_SIZE = 500
+    CHUNK_SIZE = 300
     CHUNK_OVERLAP = 100
 
     # Retrieval
