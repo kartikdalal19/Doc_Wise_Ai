@@ -302,45 +302,40 @@ async function askQuestion(){
         // Evidence Sections
         // ================================
 
-
-
+        
         let evidence="";
 
 
 
-        if(data.document){
 
+        // Show document evidence ONLY when the answer came from the document
+        if(
+            data.answer_source === "document" &&
+            data.document
+        ){
 
             evidence += `
 
-
             <details>
-
 
             <summary>
             📄 Document Evidence
             </summary>
 
-
             <pre>
-${data.document}
+        ${data.document}
             </pre>
-
 
             </details>
 
-
             `;
-
 
         }
 
 
 
-
-
-        if(data.wikipedia){
-
+        if(data.wikipedia && data.wikipedia !== "WIKIPEDIA_UNAVAILABLE")
+            {
 
             evidence += `
 
@@ -368,38 +363,188 @@ ${data.wikipedia}
 
 
 
-
-
+        // ======================================================
+// External Sources - Tavily
+// ======================================================
 
         if(data.tavily){
 
+            let tavilyHTML = "";
 
-            evidence += `
+            // --------------------------------
+            // Tavily returned an unavailable/error message
+            // --------------------------------
+
+            if(
+                typeof data.tavily === "string" &&
+                (
+                    data.tavily === "TAVILY_UNAVAILABLE" ||
+                    data.tavily === "TAVILY_ERROR" ||
+                    data.tavily.includes("TAVILY_UNAVAILABLE")
+                )
+            ){
+
+                // Do NOTHING
+                // Do not show Tavily section
+
+            }
+
+            // --------------------------------
+            // Tavily returned an array
+            // --------------------------------
+
+            else if(Array.isArray(data.tavily)){
+
+                data.tavily.forEach(result => {
+
+                    if(
+                        !result ||
+                        !result.url
+                    ){
+                        return;
+                    }
 
 
-            <details>
+                    let title =
+                        result.title ||
+                        "External Source";
 
 
-            <summary>
-            🔎 Tavily Result
-            </summary>
+                    let snippet =
+                        result.content ||
+                        result.snippet ||
+                        "";
 
 
-            <pre>
-${data.tavily}
-            </pre>
+                    // Limit snippet length
+
+                    if(snippet.length > 300){
+
+                        snippet =
+                            snippet.substring(0, 300)
+                            + "...";
+
+                    }
 
 
-            </details>
+                    tavilyHTML += `
+
+                        <div class="source-card">
+
+                            <div class="source-title">
+                                🔎 ${title}
+                            </div>
+
+                            ${
+                                snippet
+                                ?
+                                `
+                                <p class="source-snippet">
+                                    ${snippet}
+                                </p>
+                                `
+                                :
+                                ""
+                            }
+
+                            <a
+                                href="${result.url}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="source-link"
+                            >
+                                🔗 Open Source
+                            </a>
+
+                        </div>
+
+                    `;
+
+                });
+
+            }
+
+            // --------------------------------
+            // Tavily returned raw string
+            // --------------------------------
+
+            else if(
+                typeof data.tavily === "string"
+            ){
+
+                const urlRegex =
+                    /Title:\s*(.*?)\s*URL:\s*(https?:\/\/[^\s]+)/g;
 
 
-            `;
+                let match;
 
+
+                while(
+                    (match = urlRegex.exec(data.tavily))
+                    !== null
+                ){
+
+                    let title =
+                        match[1].trim();
+
+
+                    let url =
+                        match[2].trim();
+
+
+                    tavilyHTML += `
+
+                        <div class="source-card">
+
+                            <div class="source-title">
+                                🔎 ${title}
+                            </div>
+
+                            <a
+                                href="${url}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="source-link"
+                            >
+                                🔗 Open Source
+                            </a>
+
+                        </div>
+
+                    `;
+
+                }
+
+            }
+
+
+            // --------------------------------
+            // Only show section if sources exist
+            // --------------------------------
+
+            if(tavilyHTML.trim() !== ""){
+
+                evidence += `
+
+                    <details>
+
+                        <summary>
+                            🔎 External Sources
+                        </summary>
+
+                        <div class="sources-container">
+
+                            ${tavilyHTML}
+
+                        </div>
+
+                    </details>
+
+                `;
+
+            }
 
         }
-
-
-
 
 
 
@@ -435,6 +580,7 @@ ${data.tavily}
 
 
 
+        
         <h3>
         📊 Metadata
         </h3>
@@ -568,57 +714,6 @@ function handleEnter(event){
 
 
 
-
-// ======================================================
-// Add Message To Chat
-// ======================================================
-
-
-// function addMessage(
-//     text,
-//     type
-// ){
-
-
-
-//     let chat =
-//     document.getElementById(
-//         "chat"
-//     );
-
-
-
-//     let div =
-//     document.createElement(
-//         "div"
-//     );
-
-
-
-//     div.className =
-//     "message "+type;
-
-
-
-//     div.innerHTML =
-//     text;
-
-
-
-//     chat.appendChild(
-//         div
-//     );
-
-
-
-//     chat.scrollTop =
-//     chat.scrollHeight;
-
-
-
-// }
-
-
 // ======================================================
 // Add Message To Chat
 // ======================================================
@@ -629,20 +724,15 @@ function addMessage(
 ){
 
     let chat =
-    document.getElementById(
-        "chat"
-    );
+    document.getElementById("chat");
 
 
     let div =
-    document.createElement(
-        "div"
-    );
+    document.createElement("div");
 
 
     div.className =
     "message " + type;
-
 
 
     let avatar =
@@ -651,35 +741,405 @@ function addMessage(
     : "🤖";
 
 
-
     div.innerHTML =
 
     `
 
     <div class="avatar">
-
         ${avatar}
-
     </div>
 
-
     <div class="bubble">
-
         ${text}
-
     </div>
 
     `;
 
 
-
-    chat.appendChild(
-        div
-    );
+    chat.appendChild(div);
 
 
     chat.scrollTop =
     chat.scrollHeight;
 
-
 }
+
+//         let evidence="";
+
+
+
+//         if(data.document){
+
+
+//             evidence += `
+
+
+//             <details>
+
+
+//             <summary>
+//             📄 Document Evidence
+//             </summary>
+
+
+//             <pre>
+// ${data.document}
+//             </pre>
+
+
+//             </details>
+
+
+//             `;
+
+
+//         }
+
+
+
+
+
+//         if(data.wikipedia){
+
+
+//             evidence += `
+
+
+//             <details>
+
+
+//             <summary>
+//             🌐 Wikipedia Result
+//             </summary>
+
+
+//             <pre>
+// ${data.wikipedia}
+//             </pre>
+
+
+//             </details>
+
+
+//             `;
+
+
+//         }
+
+
+
+
+
+
+//         if(data.tavily){
+
+
+//             evidence += `
+
+
+//             <details>
+
+
+//             <summary>
+//             🔎 Tavily Result
+//             </summary>
+
+
+//             <pre>
+// ${data.tavily}
+//             </pre>
+
+
+//             </details>
+
+
+//             `;
+
+
+//         }
+
+
+
+
+
+
+
+//         // ================================
+//         // Final Answer
+//         // ================================
+
+
+//         let answer = `
+
+
+
+//         ${trace}
+
+
+
+//         <hr>
+
+
+//         <h2>
+//         💡 Answer
+//         </h2>
+
+
+//         <div class="answer-content">
+//         ${marked.parse(data.answer)}
+//         </div>
+
+
+
+//         <hr>
+
+
+
+//         <h3>
+//         📊 Metadata
+//         </h3>
+
+
+
+//         <p>
+
+//         <b>
+//         Source:
+//         </b>
+
+//         ${data.answer_source}
+
+
+//         <br>
+
+
+//         <b>
+//         Retrieval Score:
+//         </b>
+
+//         ${data.retrieval_score}
+
+
+//         <br>
+
+
+//         <b>
+//         Verified:
+//         </b>
+
+//         ${data.verified}
+
+
+//         <br>
+
+
+//         <b>
+//         Confidence:
+//         </b>
+
+//         ${data.confidence}
+
+
+
+//         </p>
+
+
+
+//         ${evidence}
+
+
+
+
+//         <details>
+
+
+//         <summary>
+//         ✅ Fact Check
+//         </summary>
+
+
+//         <p>
+//         ${data.verification}
+//         </p>
+
+
+//         </details>
+
+
+
+//         `;
+
+
+
+
+
+//         addMessage(
+//             answer,
+//             "bot"
+//         );
+
+
+
+//     }
+
+
+//     catch(error){
+
+
+//         console.log(error);
+
+
+//         addMessage(
+//             "❌ Server error",
+//             "bot"
+//         );
+
+
+//     }
+
+
+
+// }
+
+
+
+
+
+
+
+// // ======================================================
+// // Enter Key Support
+// // ======================================================
+
+
+// function handleEnter(event){
+
+
+//     if(event.key==="Enter"){
+
+//         askQuestion();
+
+//     }
+
+// }
+
+
+
+
+
+
+
+// // ======================================================
+// // Add Message To Chat
+// // ======================================================
+
+
+// // function addMessage(
+// //     text,
+// //     type
+// // ){
+
+
+
+// //     let chat =
+// //     document.getElementById(
+// //         "chat"
+// //     );
+
+
+
+// //     let div =
+// //     document.createElement(
+// //         "div"
+// //     );
+
+
+
+// //     div.className =
+// //     "message "+type;
+
+
+
+// //     div.innerHTML =
+// //     text;
+
+
+
+// //     chat.appendChild(
+// //         div
+// //     );
+
+
+
+// //     chat.scrollTop =
+// //     chat.scrollHeight;
+
+
+
+// // }
+
+
+// // ======================================================
+// // Add Message To Chat
+// // ======================================================
+
+// function addMessage(
+//     text,
+//     type
+// ){
+
+//     let chat =
+//     document.getElementById(
+//         "chat"
+//     );
+
+
+//     let div =
+//     document.createElement(
+//         "div"
+//     );
+
+
+//     div.className =
+//     "message " + type;
+
+
+
+//     let avatar =
+//     type === "user"
+//     ? "👤"
+//     : "🤖";
+
+
+
+//     div.innerHTML =
+
+//     `
+
+//     <div class="avatar">
+
+//         ${avatar}
+
+//     </div>
+
+
+//     <div class="bubble">
+
+//         ${text}
+
+//     </div>
+
+//     `;
+
+
+
+//     chat.appendChild(
+//         div
+//     );
+
+
+//     chat.scrollTop =
+//     chat.scrollHeight;
+
+
+// }
