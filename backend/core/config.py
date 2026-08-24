@@ -16,16 +16,22 @@ class Settings:
     
     # LLM
     # GROQ_MODEL = "llama-3.3-70b-versatile"
-    GROQ_MODEL = "openai/gpt-oss-120b"
+    # GROQ_MODEL = "openai/gpt-oss-120b"
+    # TEMPERATURE = 0
+
+    # # Chunking
+    # CHUNK_SIZE = 300
+    # CHUNK_OVERLAP = 100
+
+    # # Retrieval
+    # TOP_K = 3
+    # RETRIEVAL_THRESHOLD = 0.65
+    GROQ_MODEL = "openai/gpt-oss-20b"
     TEMPERATURE = 0
-
-    # Chunking
-    CHUNK_SIZE = 300
+    CHUNK_SIZE = 500
     CHUNK_OVERLAP = 100
-
-    # Retrieval
     TOP_K = 3
-    RETRIEVAL_THRESHOLD = 0.65
+    RETRIEVAL_THRESHOLD = 0.6
 
     # Paths
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
