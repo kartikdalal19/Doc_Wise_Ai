@@ -143,8 +143,96 @@ class DecideNode:
 # Tool Node
 # =====================================================
 
-class ToolNode:
+# class ToolNode:
 
+#     """
+#     Executes external tools.
+
+#     Current:
+#         - Wikipedia
+#         - Tavily
+
+#     Future:
+#         - Calculator
+#         - SQL
+#         - Weather
+#         - Python REPL
+#         - Arxiv
+#         - DuckDuckGo
+#         - SerpAPI
+#     """
+
+#     def __call__(self, state):
+
+#         question = state["question"]
+
+#         try:
+#             wiki = wikipedia_search.invoke(
+#                 {
+#                     "query": question
+#                 }
+#             )
+#         except Exception as e:
+#             wiki = f"Wikipedia search failed: {e}"
+
+
+#         try:
+#             tavily = tavily_search.invoke(
+#                 {
+#                     "query": question
+#                 }
+#             )
+#         except Exception as e:
+#             tavily = f"Tavily search failed: {e}"
+
+#         combined = f"""
+# Wikipedia
+
+# {wiki}
+
+# ----------------------------------------
+
+# Tavily
+
+# {tavily}
+# """
+
+#         return {
+
+#             "wiki_result": wiki,
+
+#             "tavily_result": tavily,
+
+#             "web_results": combined,
+
+#             "tools_used": [
+
+#                 "Wikipedia",
+
+#                 "Tavily"
+
+#             ],
+
+#             "thoughts":[
+
+#              "Calling Wikipedia tool",
+
+#              "Calling Tavily search tool",
+
+#              "Combining external evidence"
+
+# ],
+
+#             "sources": [
+
+#                 "Wikipedia",
+
+#                 "Tavily"
+
+#             ]
+#         }
+
+class ToolNode:
     """
     Executes external tools.
 
@@ -166,71 +254,202 @@ class ToolNode:
 
         question = state["question"]
 
+        wiki = None
+        tavily = None
+
+        tools_used = []
+        successful_sources = []
+        failed_sources = []
+
+        thoughts = []
+
+        # ==================================================
+        # WIKIPEDIA
+        # ==================================================
+
         try:
+
             wiki = wikipedia_search.invoke(
                 {
                     "query": question
                 }
             )
-        except Exception as e:
-            wiki = f"Wikipedia search failed: {e}"
 
+            if (
+                wiki
+                and not wiki.startswith("WIKIPEDIA_")
+            ):
+
+                successful_sources.append(
+                    "Wikipedia"
+                )
+
+                tools_used.append(
+                    "Wikipedia"
+                )
+
+                thoughts.append(
+                    "Wikipedia returned usable evidence"
+                )
+
+            else:
+
+                failed_sources.append(
+                    "Wikipedia"
+                )
+
+                thoughts.append(
+                    "Wikipedia search failed or returned no usable evidence"
+                )
+
+        except Exception as e:
+
+            print(
+                f"[ToolNode] Wikipedia error: {e}"
+            )
+
+            wiki = None
+
+            failed_sources.append(
+                "Wikipedia"
+            )
+
+            thoughts.append(
+                "Wikipedia tool failed"
+            )
+
+
+        # ==================================================
+        # TAVILY
+        # ==================================================
 
         try:
+
             tavily = tavily_search.invoke(
                 {
                     "query": question
                 }
             )
-        except Exception as e:
-            tavily = f"Tavily search failed: {e}"
 
-        combined = f"""
-Wikipedia
+            if tavily and str(tavily).strip():
+
+                successful_sources.append(
+                    "Tavily"
+                )
+
+                tools_used.append(
+                    "Tavily"
+                )
+
+                thoughts.append(
+                    "Tavily returned usable evidence"
+                )
+
+            else:
+
+                failed_sources.append(
+                    "Tavily"
+                )
+
+                thoughts.append(
+                    "Tavily returned no usable evidence"
+                )
+
+        except Exception as e:
+
+            print(
+                f"[ToolNode] Tavily error: {e}"
+            )
+
+            tavily = None
+
+            failed_sources.append(
+                "Tavily"
+            )
+
+            thoughts.append(
+                "Tavily search failed"
+            )
+
+
+        # ==================================================
+        # BUILD CLEAN WEB EVIDENCE
+        # ==================================================
+
+        evidence_parts = []
+
+
+        if wiki:
+
+            evidence_parts.append(
+                f"""
+SOURCE: Wikipedia
 
 {wiki}
+"""
+            )
 
-----------------------------------------
 
-Tavily
+        if tavily:
+
+            evidence_parts.append(
+                f"""
+SOURCE: Tavily
 
 {tavily}
 """
+            )
+
+
+        if evidence_parts:
+
+            combined = "\n\n".join(
+                evidence_parts
+            )
+
+        else:
+
+            combined = (
+                "No external evidence was available."
+            )
+
+
+        # ==================================================
+        # FINAL TOOL STATE
+        # ==================================================
 
         return {
 
-            "wiki_result": wiki,
+            "wiki_result":
+                wiki
+                if wiki
+                else "Wikipedia unavailable.",
 
-            "tavily_result": tavily,
+            "tavily_result":
+                tavily
+                if tavily
+                else "Tavily unavailable.",
 
-            "web_results": combined,
+            "web_results":
+                combined,
 
-            "tools_used": [
+            "tools_used":
+                tools_used,
 
-                "Wikipedia",
+            "successful_sources":
+                successful_sources,
 
-                "Tavily"
+            "failed_sources":
+                failed_sources,
 
-            ],
+            "thoughts":
+                thoughts,
 
-            "thoughts":[
-
-             "Calling Wikipedia tool",
-
-             "Calling Tavily search tool",
-
-             "Combining external evidence"
-
-],
-
-            "sources": [
-
-                "Wikipedia",
-
-                "Tavily"
-
-            ]
+            "sources":
+                successful_sources
         }
+
+
 
 # =====================================================
 # Summary Node
