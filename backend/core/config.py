@@ -30,7 +30,7 @@ class Settings:
     TEMPERATURE = 0
     CHUNK_SIZE = 500
     CHUNK_OVERLAP = 100
-    TOP_K = 3
+    TOP_K = 5
     RETRIEVAL_THRESHOLD = 0.6
 
     # Paths
